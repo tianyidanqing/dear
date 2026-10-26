@@ -72,9 +72,11 @@ schedule_agent/
 ├── deploy/                      # 部署件：Dockerfile / compose / systemd / nginx
 │   └── VM_DEPLOY.md             # ★ 虚拟机部署与运维手册（详细版）
 ├── scripts/
+│   ├── dev_setup.sh             # ★ 开发者一键建环境（--locked 按锁文件复现）
 │   ├── install.sh               # 虚拟机一键安装（含 systemd 注册）
 │   └── run_dev.py               # 开发用一键起后端+前端
 ├── tests/                       # pytest（存储隔离 + 接口鉴权）
+├── requirements.lock            # 依赖锁文件（精确版本，用于复现环境）
 └── pyproject.toml               # 打包与依赖（含 console scripts）
 ```
 
@@ -83,9 +85,18 @@ schedule_agent/
 
 ## 安装
 
+**推荐：一条命令准备开发环境**（Windows Git Bash / macOS / Linux 通用）
+
+```bash
+bash scripts/dev_setup.sh            # 建 .venv + 装全部依赖 + 自检 + 跑测试
+bash scripts/dev_setup.sh --locked   # 按 requirements.lock 严格复现「已验证可用」的版本
+```
+
+手动安装：
+
 ```bash
 cd schedule_agent
-python -m venv .venv                      # 本仓库已建好 .venv，可跳过
+python -m venv .venv
 source .venv/bin/activate                 # Linux/macOS
 source .venv/Scripts/activate             # Windows Git Bash
 # .venv\Scripts\activate.bat              # Windows CMD
@@ -99,8 +110,14 @@ pip install -e ".[dev]"      # 跑测试
 
 不激活也可以直接用完整路径，例如 `./.venv/Scripts/python.exe -m schedule_agent`。
 
-> ⚠️ 本机的 `.venv` 是 Windows 环境，**不能拷到 Linux 虚拟机复用**；
-> 虚拟机部署请按 `deploy/VM_DEPLOY.md`，脚本会在 VM 上重新建虚拟环境。
+> ⚠️ **`.venv` 不进仓库**（见 `.gitignore`），这是刻意的：
+> 虚拟环境里写死了本机绝对路径（`pyvenv.cfg` 的 `home`/`command`、
+> `__editable__.pth` 的项目路径），还含几十个 `.exe` / `.pyd` 等平台专属二进制，
+> **换机器或换系统就不能用**，而且 Git 无法对二进制做增量存储，几次依赖升级
+> 仓库就会膨胀到 GB 级。
+>
+> 要复现环境请用 **`requirements.lock`**（几 KB，`pip install -r requirements.lock`）；
+> 虚拟机部署按 `deploy/VM_DEPLOY.md`，脚本会在 VM 上重建虚拟环境。
 
 安装后得到三个命令：
 
