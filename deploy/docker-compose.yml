@@ -1,0 +1,48 @@
+# 一键起「后端 API + Gradio 前端」两个服务
+#   cd deploy && docker compose up -d
+# 数据落在命名卷 schedule-data，服务各自独立重启/扩容。
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: schedule-agent-api
+    container_name: schedule-agent-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      SCHEDULE_DATA_DIR: /var/lib/schedule-agent
+      SCHEDULE_LOG_LEVEL: INFO
+      # SCHEDULE_LLM_API_KEY: sk-xxx          # 可选：启用大模型理解
+      # SCHEDULE_ADMIN_API_KEY: change-me     # 可选：启用管理员能力
+    volumes:
+      - schedule-data:/var/lib/schedule-agent
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health').status==200 else 1)"]
+      interval: 30s
+      timeout: 3s
+      start_period: 15s
+      retries: 3
+
+  ui:
+    image: schedule-agent-api          # 复用同一镜像（含 ui 依赖时见下）
+    container_name: schedule-agent-ui
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "7860:7860"
+    environment:
+      SCHEDULE_API_URL: http://api:8000
+      SCHEDULE_UI_PORT: 7860
+    volumes:
+      - schedule-data:/var/lib/schedule-agent
+    # 前端需要 gradio，覆写启动命令安装后再启动（避免后端镜像体积膨胀）
+    entrypoint:
+      - /bin/sh
+      - -c
+      - "pip install --no-cache-dir gradio>=4.27 && exec schedule-agent-ui"
+
+volumes:
+  schedule-data:

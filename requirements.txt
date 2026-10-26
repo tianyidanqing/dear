@@ -1,0 +1,17 @@
+# 依赖以 pyproject.toml 为准（推荐：pip install ".[all]"）。
+# 本文件仅为习惯使用 `pip install -r requirements.txt` 的场景保留，等价于 all extras。
+
+# 核心（命令行与大模型调用）
+requests>=2.31
+httpx>=0.27
+
+# API 微服务
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9
+
+# Gradio 聊天窗口
+gradio>=4.27
+
+# 可选：桌面 Toast 通知
+plyer>=2.1.0

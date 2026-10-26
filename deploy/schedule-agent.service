@@ -1,0 +1,49 @@
+# systemd 单元：在虚拟机上把后端 API 托管为系统服务
+# 安装：
+#   sudo cp deploy/schedule-agent.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now schedule-agent
+# 查看：
+#   systemctl status schedule-agent
+#   journalctl -u schedule-agent -f
+
+[Unit]
+Description=Schedule Agent API (FastAPI)
+Documentation=https://example.invalid/schedule-agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# 建议用专用用户运行，不要用 root
+User=schedule
+Group=schedule
+
+# 代码安装位置（pip install 后命令所在目录，按需调整）
+WorkingDirectory=/opt/schedule-agent
+Environment=PATH=/opt/schedule-agent/.venv/bin:/usr/local/bin:/usr/bin:/bin
+
+# 数据与配置放在代码之外，便于备份 / 挂数据盘 / 轮转日志
+Environment=SCHEDULE_DATA_DIR=/var/lib/schedule-agent
+Environment=SCHEDULE_CONFIG=/etc/schedule-agent/config.json
+Environment=SCHEDULE_LOG_LEVEL=INFO
+# Environment=SCHEDULE_LLM_API_KEY=sk-xxx
+# Environment=SCHEDULE_ADMIN_API_KEY=change-me
+# 如需加载 .env：EnvironmentFile=/etc/schedule-agent/env
+
+ExecStart=/opt/schedule-agent/.venv/bin/schedule-agent-api
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=3
+KillSignal=SIGTERM
+TimeoutStopSec=20
+
+# 安全加固（按需放宽）
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/schedule-agent
+
+[Install]
+WantedBy=multi-user.target

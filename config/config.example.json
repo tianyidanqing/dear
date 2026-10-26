@@ -1,0 +1,44 @@
+{
+  "_说明": "复制为 config/config.json（或 /etc/schedule-agent/config.json）后修改。所有字段都可用环境变量覆盖（见 README）。",
+
+  "data_dir": "data",
+  "log_level": "INFO",
+
+  "_language说明": "默认语言：zh-CN 或 en-US。单个请求可用 Accept-Language 请求头或 ?lang= 覆盖；命令行与前端取这个值。新增语言只要往 src/schedule_agent/i18n/locales/ 放一个 <locale>.json，不用改代码。",
+  "language": "zh-CN",
+
+  "_llm说明": "任何 OpenAI Chat Completions 兼容服务都行：DeepSeek 用 https://api.deepseek.com/v1 + deepseek-chat；通义/本地 vLLM 同理换 base_url 与 model。",
+  "llm_api_key": "",
+  "llm_base_url": "https://api.openai.com/v1",
+  "llm_model": "gpt-4o-mini",
+
+  "_use_rule_fallback说明": "false（推荐）=意图只由大模型判断，模型不可用直接报错；true=允许退化成关键词规则（不推荐）。",
+  "use_rule_fallback": false,
+
+  "_channels说明": "第三方渠道：每个平台一段，配置与协议代码都在 src/schedule_agent/channels/<平台>/ 里。新增平台只需复制 channels/_template 改名，不用改 core。全部留空则不启用任何渠道。",
+  "_wecom说明": "企业微信自建应用：五项齐全才启用。回调地址填 https://<你的域名>/api/channels/wecom/callback（旧地址 /api/wecom/callback 仍可用），服务需装 pip install '.[wecom]'。旧式扁平写法 wecom_corp_id 等仍然兼容。",
+  "channels": {
+    "wecom": {
+      "corp_id": "",
+      "agent_id": "",
+      "secret": "",
+      "token": "",
+      "aes_key": "",
+      "_bind_map说明": "把企微 UserID 绑定到已有账号，共用同一份日程；留空则每人独立空间 wecom:<UserID>。",
+      "bind_map": {}
+    }
+  },
+
+  "daily_summary_time": "08:00",
+  "lead_minutes": 10,
+  "interval": 20,
+
+  "admin_api_key": "",
+
+  "api_host": "0.0.0.0",
+  "api_port": 8000,
+  "ui_port": 7860,
+
+  "_allowed_origins说明": "CORS 允许的源列表。默认 ['*'] 允许所有源（开发用）；生产环境建议改为具体域名如 ['https://example.com']。当列表包含 '*' 时，allow_credentials 会自动设为 false。",
+  "allowed_origins": ["*"]
+}

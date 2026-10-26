@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "schedule-agent"
+version = "4.1.0"
+description = "个人日程管理 AI Agent：自然语言增删改待办、动态重排、到点提醒（FastAPI 微服务 + Gradio 前端 + 多用户隔离 + API 鉴权）"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "schedule-agent" }]
+# 核心只依赖标准库 + requests/httpx；Web 相关依赖做成 extras，
+# 这样只在虚拟机上跑 CLI / 后端时不必装 Gradio。
+dependencies = [
+    "requests>=2.31",
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+api = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "python-multipart>=0.0.9",
+]
+ui = ["gradio>=4.27"]
+notify = ["plyer>=2.1.0"]          # 桌面 Toast（可选）
+wecom = ["cryptography>=42"]       # 企业微信回调加解密（AES-256-CBC）
+dev = [
+    "pytest>=7.4",
+    "websockets>=12.0",
+]
+all = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "python-multipart>=0.0.9",
+    "gradio>=4.27",
+    "plyer>=2.1.0",
+    "cryptography>=42",
+]
+
+[project.scripts]
+schedule-agent = "schedule_agent.cli.main:main"
+schedule-agent-api = "schedule_agent.api.app:main"
+schedule-agent-ui = "schedule_agent.ui.gradio_app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+# i18n 词典是运行期数据文件，不声明的话 pip 安装后 locales/ 不会被打进 wheel，
+# 表现为「源码跑正常，装完只剩 key」——这类问题在部署后才暴露，很难查。
+[tool.setuptools.package-data]
+"schedule_agent.i18n" = ["locales/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["src"]
