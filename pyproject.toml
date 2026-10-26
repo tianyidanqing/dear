@@ -9,13 +9,18 @@ description = "个人日程管理 AI Agent：自然语言增删改待办、动�
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "schedule-agent" }]
+authors = [{ name = "tianyidanqing" }]
 # 核心只依赖标准库 + requests/httpx；Web 相关依赖做成 extras，
 # 这样只在虚拟机上跑 CLI / 后端时不必装 Gradio。
 dependencies = [
     "requests>=2.31",
     "httpx>=0.27",
 ]
+
+[project.urls]
+Homepage = "https://github.com/tianyidanqing/dear"
+Repository = "https://github.com/tianyidanqing/dear"
+Issues = "https://github.com/tianyidanqing/dear/issues"
 
 [project.optional-dependencies]
 api = [

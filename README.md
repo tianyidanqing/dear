@@ -1,5 +1,11 @@
 # 日程管理 AI Agent
 
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.110%2B-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Tests](https://img.shields.io/badge/tests-152%20passed-brightgreen)](tests/)
+[![i18n](https://img.shields.io/badge/i18n-zh--CN%20%7C%20en--US-blue)](src/schedule_agent/i18n/locales/)
+
 一个用 Python 实现的日程管理智能体：**自然语言增删改待办 → 动态重排当日日程 → 到点提醒**。
 现已整理为**分层包结构 + 可打包安装 + 配置/数据外置**，便于部署到虚拟机或容器。
 
